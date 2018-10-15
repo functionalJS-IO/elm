@@ -5,6 +5,7 @@ type BinTree a
     = Node (BinTree a) a (BinTree a)
     | Leaf
 
+type Zipper a = TODO -- Please implement this type
 
 fromTree : BinTree a -> Zipper a
 fromTree =

@@ -47,9 +47,21 @@ type ZipperTrail a
 
 {-| Get a zipper focussed on the root node.
 -}
-fromTree : BinTree a -> Zipper a
-fromTree (BT v l r) =
-    Z v l r T
+fromTree : BinTree a -> Maybe (Zipper a)
+fromTree tree =
+    case tree of
+        Node leftTree val rightTree ->
+            Just
+                (Zipper
+                    { value = val
+                    , left = leftTree
+                    , right = rightTree
+                    , trail = Top
+                    }
+                )
+
+        Leaf ->
+            Nothing
 
 
 {-| Get the complete tree from a zipper.
@@ -102,7 +114,7 @@ left (Zipper zip) =
 -}
 right : Zipper a -> Maybe (Zipper a)
 right (Zipper zip) =
-    case right of
+    case zip.right of
         Leaf ->
             Nothing
 
@@ -112,7 +124,7 @@ right (Zipper zip) =
                     { value = treeVal
                     , left = leftTree
                     , right = rightTree
-                    , trail = Right value left trail
+                    , trail = Right zip.value zip.left zip.trail
                     }
                 )
 
@@ -121,7 +133,7 @@ right (Zipper zip) =
 -}
 up : Zipper a -> Maybe (Zipper a)
 up (Zipper zip) =
-    case trail of
+    case zip.trail of
         Left pv pr zt ->
             Just
                 (Zipper
@@ -155,13 +167,13 @@ setValue v (Zipper z) =
 
 {-| Replace a left child tree.
 -}
-setLeft : Maybe (BinTree a) -> Zipper a -> Zipper a
+setLeft : BinTree a -> Zipper a -> Zipper a
 setLeft t (Zipper z) =
     Zipper { z | left = t }
 
 
 {-| Replace a right child tree.
 -}
-setRight : Maybe (BinTree a) -> Zipper a -> Zipper a
+setRight : BinTree a -> Zipper a -> Zipper a
 setRight t (Zipper z) =
     Zipper { z | right = t }
