@@ -40,8 +40,8 @@ and the value and other paths higher up in the tree.
 
 -}
 type ZipperTrail a
-    = Left a (Maybe (BinTree a)) (ZipperTrail a) -- Left path taken
-    | Right a (Maybe (BinTree a)) (ZipperTrail a) -- Right path taken
+    = Left a (BinTree a) (ZipperTrail a) -- Left path taken
+    | Right a (BinTree a) (ZipperTrail a) -- Right path taken
     | Top -- Top level
 
 
@@ -120,22 +120,30 @@ right (Zipper zip) =
 {-| Get the parent of the focus node, if any.
 -}
 up : Zipper a -> Maybe (Zipper a)
-up (Zipper { value, left, right, trail }) =
+up (Zipper zip) =
     case trail of
         Left pv pr zt ->
-            Just (Zipper { value = pv, left = (Just (Node left value right)), right = pr, trail = zt })
+            Just
+                (Zipper
+                    { value = pv
+                    , left = Node zip.left zip.value zip.right
+                    , right = pr
+                    , trail = zt
+                    }
+                )
 
         Right pv pl zt ->
-            Nothing
+            Just
+                (Zipper
+                    { value = pv
+                    , left = pl
+                    , right = Node zip.left zip.value zip.right
+                    , trail = zt
+                    }
+                )
 
         Top ->
             Nothing
-up (Z v l r (L pv pr zt)) =
-    Just (Z pv (Just (BT v l r)) pr zt)
-up (Z v l r (R pv pl zt)) =
-    Just (Z pv pl (Just (BT v l r)) zt)
-up (Z _ _ _ T) =
-    Nothing
 
 
 {-| Set the value of the focus node.
